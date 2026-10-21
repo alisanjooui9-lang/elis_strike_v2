@@ -97,7 +97,8 @@ const LV=[{map:0,n:4,goal:8,sk:.35},{map:1,n:5,goal:12,sk:.45},{map:2,n:6,goal:1
 let S={name:'Player'+(Math.random()*900+100|0),xp:0,lv:1,coins:600,owned:{ar:0,smg:0},sel:'ar',kills:0,wins:0,daily:0,mode:0,map:0,cl:0,camp:0,op:0,lo:[null,null],att:{},set:{}};
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){}
 S.set=Object.assign({sens:5,fov:75,q:1,vol:7,diff:2,bs:1,lay:{},ad:5},S.set);
-const save=()=>{S.coins=Math.max(S.coins,99999999);try{
+const save=()=>{try{const o=Object.assign({},S);if(state=='play'&&P.keep)o.sel=P.keep;localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}};
+const need=()=>150+S.lv*100;
 function att(k){const a=S.att[k]||{};return{sc:a.sc===undefined?(WP[k].t=='sn'?4:0):a.sc,mz:a.mz||0,gr:a.gr||0,mg:a.mg||0,pt:a.pt||0,cl:a.cl||0}}
 const mg=k=>Math.round(WP[k].mag*(att(k).mg?1.5:1)),zm=()=>SCP[att(S.sel).sc].z||WP[S.sel].zoom;
 function addXP(x){S.xp+=x;let up=0;while(S.xp>=need()){S.xp-=need();S.lv++;S.coins+=S.lv*50;up++}return up}
