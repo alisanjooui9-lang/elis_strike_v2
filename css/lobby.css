@@ -1,0 +1,71 @@
+/* ELIS STRIKE V2 lobby: black / navy / neon blue / gold. Sizes use vh/vw so it fits landscape phones. */
+.card.lob3w{position:fixed;inset:0;width:auto;max-width:none;max-height:none;padding:0;border:0;border-radius:0;background:none;overflow:hidden}
+.card.chrc{position:fixed;inset:0;width:auto;max-width:none;max-height:none;padding:1.5vh 1.5vw;border:0;border-radius:0;background:none;display:flex;align-items:center;justify-content:flex-start;pointer-events:none}
+.chrc .chp{pointer-events:auto;width:min(38vw,300px);max-height:92vh;overflow:auto}
+.lob3{--gold:#f5c542;--blue:#38a4ff;position:absolute;inset:0;direction:ltr;color:#eaf2ff;font-size:max(11px,2.9vh)}
+.lob3 button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lob3 button:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+.lob3 .rt{direction:rtl;text-align:right;min-width:0}
+.lob3 b{font-weight:700}
+.lob3 small{display:block;color:#9fb6d6;font-size:.82em}
+.ic{width:1.7em;height:1.7em;flex:none}
+.ico{width:1.4em;height:1.4em;vertical-align:middle;flex:none}
+.cur{display:inline-flex;align-items:center;gap:4px;margin-inline-end:10px;font-weight:700}
+.xpb{height:.45em;min-height:5px;background:#ffffff22;margin-top:.3em;direction:ltr;border-radius:3px;overflow:hidden}
+.xpb i{display:block;height:100%;background:linear-gradient(90deg,#d4a017,#ffe27a)}
+.row button{min-height:40px}
+
+/* top bar */
+.tb{position:absolute;top:1.5vh;left:1.5vw;right:1.5vw;height:max(44px,12.5vh);display:flex;align-items:center;gap:max(6px,.9vw)}
+.logo{display:flex;flex-direction:column;line-height:.95;font-style:italic;font-weight:900;letter-spacing:.04em;font-size:max(13px,3.6vh);background:linear-gradient(#fff,#f5c542 60%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 6px #000);white-space:nowrap;margin-right:.5vw}
+.lob3 .logo small{font-size:.5em;color:var(--gold);-webkit-text-fill-color:var(--gold);text-align:right}
+.prof{display:flex;align-items:center;gap:8px;height:100%;padding:0 3vw 0 0;width:max(150px,23vw);min-width:0;border:1px solid #2d4a78;background:linear-gradient(90deg,#0a1424,#10213c);clip-path:polygon(0 0,100% 0,94% 100%,0 100%);text-align:left}
+.prof svg{height:100%;width:auto;aspect-ratio:1;flex:none;border-right:1px solid var(--gold)}
+.prof .rt{flex:1;direction:ltr;text-align:left}
+.prof b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp{flex:1}
+.cu{display:flex;align-items:center;gap:.5em;height:78%;padding-left:.6em;border:1px solid #2d4a78;background:linear-gradient(90deg,#0a1424,#14284a);min-width:max(100px,13.5vw)}
+.cu b{flex:1;text-align:center;font-size:1.1em}
+.cu button{width:max(36px,5.2vh);align-self:stretch;border:0;background:linear-gradient(#ffd76a,#e0a000);color:#2a1b00;font-size:1.5em;font-weight:900;padding:0}
+.cu.es button{background:linear-gradient(#58b6ff,#1f6fd8);color:#fff}
+.ib{width:max(44px,6vh);height:max(44px,6vh);border:0;background:none;color:#dfe9ff;padding:.5em;flex:none}
+.ib .ic{width:100%;height:100%}
+.net{width:1.6em;height:1.6em;flex:none}
+.net .ic{width:100%;height:100%}
+.net.ok{color:#3ddc84}.net.off{color:#ff5555}
+
+/* left menu */
+.lm{position:absolute;left:1.5vw;top:17vh;bottom:19vh;width:max(150px,20vw);display:flex;flex-direction:column;gap:max(3px,.9vh);overflow-y:auto}
+.mi{position:relative;flex:1;min-height:36px;display:flex;align-items:center;gap:.7em;padding:0 1em 0 .7em;border:1px solid #2a3f66;background:linear-gradient(90deg,#0b1524e6,#13233fe6);clip-path:polygon(0 0,100% 0,93% 100%,0 100%)}
+.mi .ic{color:#cfe0ff;width:1.6em;height:1.6em}
+.mi span{flex:1;direction:rtl;text-align:right;font-weight:700}
+.mi.gold{background:linear-gradient(90deg,#3a2a05e6,#1a1303e6);border-color:var(--gold)}
+.mi.gold .ic,.mi.gold span{color:var(--gold)}
+.dot{position:absolute;top:.3em;right:1.4em;width:.8em;height:.8em;border-radius:50%;background:#ff3b3b;box-shadow:0 0 6px #f33}
+
+/* right cards */
+.rc{position:absolute;right:1.5vw;top:17vh;bottom:19vh;width:max(190px,29vw);display:flex;flex-direction:column;gap:max(3px,.9vh)}
+.pc{flex:1;min-height:36px;display:flex;align-items:center;gap:.8em;padding:0 .8em;border:1px solid #2a6fc0;border-right:0;background:linear-gradient(270deg,#0d1b33f0,#12284bf0);box-shadow:inset 0 0 14px #1f6fd855;clip-path:polygon(4% 0,100% 0,100% 100%,0 100%);text-align:right}
+.pc .rt{flex:1}
+.pc b{display:block;font-size:1.1em;color:#fff}
+.pc .ic{width:2em;height:2em;color:var(--gold)}
+.pc>.ic:last-child:not(:first-child){width:1.3em;height:1.3em;color:var(--blue)}
+.pc.promo{flex:1.4;background:linear-gradient(270deg,#2a1d05f0,#14100af0);border-color:var(--gold)}
+.pc.ev{background:linear-gradient(270deg,#251046f0,#121a40f0);border-color:#8a5cff}
+.pc.ev .ic{color:#b99bff}
+
+/* bottom nav + start button */
+.bn{position:absolute;left:1.5vw;bottom:2vh;width:62vw;height:max(44px,13vh);display:flex;border:1px solid #2a3f66;background:linear-gradient(#0a1424f2,#060c18f2);clip-path:polygon(0 0,97% 0,100% 100%,0 100%)}
+.nv3{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1em;border:0;background:none;color:#bcd0f0;font-size:.85em;padding:0;min-width:0}
+.nv3 .ic{width:1.8em;height:1.8em}
+.nv3.on{background:linear-gradient(#5a420c,#2a1d05);color:var(--gold)}
+.go{position:absolute;right:1.5vw;bottom:2vh;width:max(170px,30vw);height:max(48px,14.5vh);display:flex;align-items:center;justify-content:center;gap:.6em;border:0;background:linear-gradient(#ffe27a,#f0b400 55%,#c88a00);color:#2a1b00!important;font-size:1.6em;font-weight:900;clip-path:polygon(6% 0,100% 0,100% 100%,0 100%);animation:goPulse 2.4s ease-in-out infinite}
+.go .ic{width:1.1em;height:1.1em}
+@keyframes goPulse{50%{filter:brightness(1.18)}}
+@media (prefers-reduced-motion:reduce){.go{animation:none}.toast{transition:none}}
+
+/* toast */
+.toast{position:absolute;left:50%;top:16vh;transform:translate(-50%,-10px);opacity:0;pointer-events:none;background:#0b1424ee;border:1px solid var(--gold);padding:.5em 1em;border-radius:8px;transition:.2s;direction:rtl;white-space:nowrap;z-index:3}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:700px){.net{display:none}.prof{width:max(120px,20vw)}.cu{min-width:92px}}
