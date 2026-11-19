@@ -1,19 +1,50 @@
-/* ELIS STRIKE V2 lobby: black / navy / neon blue / gold. Sizes use vh/vw so it fits landscape phones. */
-.card.lob3w{position:fixed;inset:0;width:auto;max-width:none;max-height:none;padding:0;border:0;border-radius:0;background:none;overflow:hidden}
-.card.chrc{position:fixed;inset:0;width:auto;max-width:none;max-height:none;padding:1.5vh 1.5vw;border:0;border-radius:0;background:none;display:flex;align-items:center;justify-content:flex-start;pointer-events:none}
-.chrc .chp{pointer-events:auto;width:min(38vw,300px);max-height:92vh;overflow:auto}
+/* ELIS STRIKE V2: black / navy / neon blue / gold. Sizes use vh/vw so it fits landscape phones. */
+.card.lob3w{position:fixed;inset:0;width:auto;max-width:none;max-height:none;padding:0;border:0;border-radius:0;background:none;overflow:hidden;box-shadow:none}
 .lob3{--gold:#f5c542;--blue:#38a4ff;position:absolute;inset:0;direction:ltr;color:#eaf2ff;font-size:max(11px,2.9vh)}
 .lob3 button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.lob3 button:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+.lob3 button:focus-visible,.card button:focus-visible{outline:2px solid var(--gold,#f5c542);outline-offset:-3px}
 .lob3 .rt{direction:rtl;text-align:right;min-width:0}
 .lob3 b{font-weight:700}
-.lob3 small{display:block;color:#9fb6d6;font-size:.82em}
+.lob3 .rt small,.lob3 .logo small{display:block;color:#9fb6d6;font-size:.82em}
 .ic{width:1.7em;height:1.7em;flex:none}
 .ico{width:1.4em;height:1.4em;vertical-align:middle;flex:none}
 .cur{display:inline-flex;align-items:center;gap:4px;margin-inline-end:10px;font-weight:700}
 .xpb{height:.45em;min-height:5px;background:#ffffff22;margin-top:.3em;direction:ltr;border-radius:3px;overflow:hidden}
 .xpb i{display:block;height:100%;background:linear-gradient(90deg,#d4a017,#ffe27a)}
-.row button{min-height:40px}
+
+/* ---- shared look for every old-style panel, list, chip and button (all screens + match result) ---- */
+.card:not(.lob3w){background:linear-gradient(#0b1424f2,#070d1af2);border:1px solid #2a6fc0;border-radius:6px;box-shadow:0 0 24px #1f6fd833}
+.card h1,.pnl h1{color:#f5c542;letter-spacing:1px}
+.card h3,.pnl h3{color:#f5c542;font-size:14px;margin:12px 0 6px}
+.card p,.pnl p{color:#a9bfdc}
+.pn{background:#0a1424d9;border:1px solid #2a6fc0;border-radius:6px;box-shadow:inset 0 0 14px #1f6fd833}
+.card button.m,.pnl button.m{background:linear-gradient(#ffe27a,#f0b400 55%,#c88a00);color:#2a1b00;font-weight:700;border-radius:0;clip-path:polygon(3% 0,100% 0,97% 100%,0 100%);min-height:44px}
+.card button.g,.pnl button.g{background:linear-gradient(90deg,#0f2040,#16315c)!important;color:#eaf2ff;border:1px solid #2a6fc0}
+.card button:disabled,.pnl button:disabled{opacity:.4}
+.row{border-bottom:1px solid #2a6fc055}
+.row.me{background:#f5c54222}
+.row button{background:linear-gradient(#58b6ff,#1f6fd8);color:#fff;border-radius:4px;min-height:40px}
+.chips button{border:1px solid #2a6fc0;background:#0f2040;color:#eaf2ff;border-radius:4px;min-height:40px}
+.chips .on{background:linear-gradient(#ffe27a,#f0b400);color:#2a1b00;border-color:#f5c542;font-weight:700}
+input[type=range]{accent-color:#f5c542}
+
+/* ---- screens opened from the lobby (shell) ---- */
+.scr .ttl{margin:0;font-size:1.5em;font-weight:900;color:var(--gold);direction:rtl;white-space:nowrap}
+.bk{width:max(44px,6vh);height:max(44px,6vh);border:1px solid #2a6fc0;background:#0f2040;color:var(--gold);display:flex;align-items:center;justify-content:center;padding:0;flex:none;clip-path:polygon(0 0,100% 0,88% 100%,0 100%)}
+.bk .ic{transform:rotate(180deg)}
+.sbody{position:absolute;left:1.5vw;right:1.5vw;top:15vh;bottom:19vh;overflow:auto;direction:rtl}
+.pnl{max-width:560px;margin:0 auto;background:#0a1424e8;border:1px solid #2a6fc0;border-radius:6px;padding:1em;text-align:right;box-shadow:0 0 24px #1f6fd833}
+.pnl.bare{max-width:none;background:none;border:0;box-shadow:none;padding:0;height:100%}
+.pnl.bare .lob2{height:100%}
+.pnl.bare .pn{max-height:100%}
+.pnl .two{display:flex;gap:6px;flex-wrap:wrap}
+.chp{width:min(38vw,300px)}
+.mapg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.mapc{position:relative;height:max(56px,13vh);display:flex;align-items:flex-end;padding:6px 8px;border:1px solid #2a6fc0;background:linear-gradient(160deg,var(--f),var(--g));color:#fff;text-align:right;overflow:hidden;border-radius:4px}
+.mapc::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 25%,#000c)}
+.mapc b{position:relative;z-index:1;font-size:12px;text-shadow:0 1px 3px #000}
+.mapc.on{border:2px solid var(--gold,#f5c542);box-shadow:0 0 12px #f5c54288}
+.mapc:disabled{opacity:.4}
 
 /* top bar */
 .tb{position:absolute;top:1.5vh;left:1.5vw;right:1.5vw;height:max(44px,12.5vh);display:flex;align-items:center;gap:max(6px,.9vw)}
@@ -24,9 +55,9 @@
 .prof .rt{flex:1;direction:ltr;text-align:left}
 .prof b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sp{flex:1}
-.cu{display:flex;align-items:center;gap:.5em;height:78%;padding-left:.6em;border:1px solid #2d4a78;background:linear-gradient(90deg,#0a1424,#14284a);min-width:max(100px,13.5vw)}
+.cu{display:flex;align-items:center;gap:.5em;height:78%;padding:0 .6em;border:1px solid #2d4a78;background:linear-gradient(90deg,#0a1424,#14284a);min-width:max(100px,13.5vw)}
 .cu b{flex:1;text-align:center;font-size:1.1em}
-.cu button{width:max(36px,5.2vh);align-self:stretch;border:0;background:linear-gradient(#ffd76a,#e0a000);color:#2a1b00;font-size:1.5em;font-weight:900;padding:0}
+.cu button{width:max(36px,5.2vh);align-self:stretch;margin-right:-.6em;border:0;background:linear-gradient(#ffd76a,#e0a000);color:#2a1b00;font-size:1.5em;font-weight:900;padding:0}
 .cu.es button{background:linear-gradient(#58b6ff,#1f6fd8);color:#fff}
 .ib{width:max(44px,6vh);height:max(44px,6vh);border:0;background:none;color:#dfe9ff;padding:.5em;flex:none}
 .ib .ic{width:100%;height:100%}
@@ -68,4 +99,4 @@
 .toast{position:absolute;left:50%;top:16vh;transform:translate(-50%,-10px);opacity:0;pointer-events:none;background:#0b1424ee;border:1px solid var(--gold);padding:.5em 1em;border-radius:8px;transition:.2s;direction:rtl;white-space:nowrap;z-index:3}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-@media (max-width:700px){.net{display:none}.prof{width:max(120px,20vw)}.cu{min-width:92px}}
+@media (max-width:700px){.net{display:none}.prof{width:max(120px,20vw)}.cu{min-width:92px}.scr .ttl{font-size:1.2em}}
