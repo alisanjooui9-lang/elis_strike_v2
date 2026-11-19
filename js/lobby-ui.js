@@ -2,7 +2,7 @@
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Names are rendered with innerHTML in several places, so markup characters are removed at the source.
 S.name=String(S.name||'').replace(/[<>&"'`]/g,'').slice(0,14)||'Player';
-// ES = premium currency. Starts at 50. There is no way to earn or spend it yet.
+// ES = premium currency. Starts at 50 and is earned by completing missions (see missions.js). Nothing spends it yet.
 if(!Number.isFinite(S.es))S.es=50;
 const IC={
  cart:'<path d="M3 4h3l2.5 11h9.5l2-8H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/>',
@@ -44,10 +44,10 @@ function lobbyHTML(){
   '<div class="logo" role="img" aria-label="ELIS STRIKE V2"><span>ELIS</span><span>STRIKE</span><small>V2</small></div>'+
   '<button class="prof" onclick="rename()" aria-label="تغییر نام">'+AVA+'<div class="rt"><b>'+esc(S.name)+'</b><small>Lv. '+S.lv+'</small><div class="xpb"><i style="width:'+pct+'%"></i></div></div></button><div class="sp"></div>'+
   '<div class="cu">'+ICO.E+'<b>'+S.coins+'</b><button aria-label="افزودن E" onclick="view(\'box\')">+</button></div>'+
-  '<div class="cu es">'+ICO.ES+'<b>'+S.es+'</b><button aria-label="افزودن ES" onclick="soon(\'خرید ES\')">+</button></div>'+
+  '<div class="cu es">'+ICO.ES+'<b>'+S.es+'</b><button aria-label="کسب ES از مأموریت‌ها" onclick="view(\'ms\')">+</button></div>'+
   '<button class="ib" aria-label="دوستان" onclick="soon(\'دوستان\')">'+ic('people')+'</button><button class="ib" aria-label="پیام‌ها" onclick="soon(\'پیام‌ها\')">'+ic('mail')+'</button><button class="ib" aria-label="تنظیمات" onclick="view(\'set\')">'+ic('gear')+'</button>'+
   '<span id="net" class="net ok" role="img" aria-label="وضعیت اتصال">'+ic('wifi')+'</span></div>'+
-  '<nav class="lm" aria-label="منوی اصلی">'+mi('cart','فروشگاه',"view('box')",{g:1})+mi('target','مأموریت‌ها',"soon('مأموریت‌ها')")+mi('gift','جوایز روزانه','daily()',{dot:dly})+mi('cal','رویدادها',"soon('رویدادها')")+mi('people','دوستان',"soon('دوستان')")+mi('trophy','جدول رتبه‌بندی',"view('lb')")+'</nav>'+
+  '<nav class="lm" aria-label="منوی اصلی">'+mi('cart','فروشگاه',"view('box')",{g:1})+mi('target','مأموریت‌ها',"view('ms')",{dot:msReady()})+mi('gift','جوایز روزانه','daily()',{dot:dly})+mi('cal','رویدادها',"soon('رویدادها')")+mi('people','دوستان',"soon('دوستان')")+mi('trophy','جدول رتبه‌بندی',"view('lb')")+'</nav>'+
   '<div class="rc">'+pc('trophy','به‌زودی','مسابقات ویژه',"soon('مسابقات ویژه')",'promo')+pc('skull','حالت بازی',NM[S.mode],"view('modes')",'',1)+pc('pin','انتخاب نقشه',mp,"view('modes')",'',1)+pc('chest','رویداد ویژه','جعبه‌های جایزه',"view('box')",'ev')+'</div>'+
   '<nav class="bn" aria-label="ناوبری">'+nv('home','خانه',"view('main')",1)+nv('gun','لوداوت',"view('arm')")+nv('helmet','شخصیت',"view('chr')")+nv('shield','کلن',"soon('کلن')")+nv('chart','رتبه‌بندی',"view('lb')")+nv('gear','تنظیمات',"view('set')")+'</nav>'+
   '<button class="go" onclick="startMatch()"><span>شروع بازی</span>'+ic('play')+'</button><div id="toast" class="toast" role="status" aria-live="polite"></div></div>'}
