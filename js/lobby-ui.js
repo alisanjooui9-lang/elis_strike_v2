@@ -23,7 +23,9 @@ const IC={
  chest:'<rect x="3" y="9" width="18" height="11" rx="1"/><path d="M3 13h18M12 11v4M3 9a9 9 0 0 1 18 0"/>',
  pin:'<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
  chev:'<path d="M9 6l6 6-6 6"/>',
- play:'<path d="M7 4l13 8-13 8z" fill="currentColor"/>'};
+ play:'<path d="M7 4l13 8-13 8z" fill="currentColor"/>',
+ full:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+ fullx:'<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>'};
 const ic=n=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>';
 // Currency symbols: E (gold coin) and ES (blue crystal). Use these everywhere a price or balance is shown.
 const ICO={
@@ -35,6 +37,16 @@ function toast(t){const e=$('toast');if(!e)return;e.textContent=t;e.classList.ad
 const soon=n=>toast('«'+n+'» هنوز آماده نیست')
 function netUp(){const e=$('net');if(e){e.classList.toggle('ok',navigator.onLine);e.classList.toggle('off',!navigator.onLine)}}
 addEventListener('online',netUp);addEventListener('offline',netUp);
+// Fullscreen toggle (lobby top bar). Uses the standard API with the WebKit-prefixed fallback.
+// iPhone Safari has no Fullscreen API for normal pages, so there the player is told to use "Add to Home Screen".
+const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+function toggleFS(){const d=document,e=d.documentElement;
+ if(isFS()){try{(d.exitFullscreen||d.webkitExitFullscreen).call(d)}catch(x){}return}
+ const f=e.requestFullscreen||e.webkitRequestFullscreen;
+ if(!f)return toast('این مرورگر تمام‌صفحه را پشتیبانی نمی‌کند. در آیفون: اشتراک‌گذاری ← افزودن به صفحه اصلی');
+ try{const p=f.call(e);if(p&&p.catch)p.catch(()=>toast('تمام‌صفحه انجام نشد'));if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{})}catch(x){toast('تمام‌صفحه انجام نشد')}}
+function fsUpd(){const b=$('fsb');if(b)b.innerHTML=ic(isFS()?'fullx':'full')}
+addEventListener('fullscreenchange',fsUpd);addEventListener('webkitfullscreenchange',fsUpd);
 function lobbyHTML(){
  const dly=Date.now()-S.daily>864e5,pct=clamp(S.xp/need()*100,0,100),mp=S.mode==2?'مرحله '+(S.cl+1)+' · '+MAPN[LV[S.cl].map]:MAPN[S.map];
  const mi=(i,t,f,o)=>'<button class="mi'+(o&&o.g?' gold':'')+'" onclick="'+f+'">'+ic(i)+'<span>'+t+'</span>'+(o&&o.dot?'<i class="dot" role="img" aria-label="جایزه آماده است"></i>':'')+'</button>';
@@ -45,7 +57,7 @@ function lobbyHTML(){
   '<button class="prof" onclick="rename()" aria-label="تغییر نام">'+AVA+'<div class="rt"><b>'+esc(S.name)+'</b><small>Lv. '+S.lv+'</small><div class="xpb"><i style="width:'+pct+'%"></i></div></div></button><div class="sp"></div>'+
   '<div class="cu">'+ICO.E+'<b>'+S.coins+'</b><button aria-label="افزودن E" onclick="view(\'box\')">+</button></div>'+
   '<div class="cu es">'+ICO.ES+'<b>'+S.es+'</b><button aria-label="کسب ES از مأموریت‌ها" onclick="view(\'ms\')">+</button></div>'+
-  '<button class="ib" aria-label="دوستان" onclick="soon(\'دوستان\')">'+ic('people')+'</button><button class="ib" aria-label="پیام‌ها" onclick="soon(\'پیام‌ها\')">'+ic('mail')+'</button><button class="ib" aria-label="تنظیمات" onclick="view(\'set\')">'+ic('gear')+'</button>'+
+  '<button class="ib" aria-label="دوستان" onclick="soon(\'دوستان\')">'+ic('people')+'</button><button class="ib" aria-label="پیام‌ها" onclick="soon(\'پیام‌ها\')">'+ic('mail')+'</button><button class="ib" id="fsb" aria-label="تمام‌صفحه" onclick="toggleFS()">'+ic(isFS()?'fullx':'full')+'</button><button class="ib" aria-label="تنظیمات" onclick="view(\'set\')">'+ic('gear')+'</button>'+
   '<span id="net" class="net ok" role="img" aria-label="وضعیت اتصال">'+ic('wifi')+'</span></div>'+
   '<nav class="lm" aria-label="منوی اصلی">'+mi('cart','فروشگاه',"view('box')",{g:1})+mi('target','مأموریت‌ها',"view('ms')",{dot:msReady()})+mi('gift','جوایز روزانه','daily()',{dot:dly})+mi('cal','رویدادها',"soon('رویدادها')")+mi('people','دوستان',"soon('دوستان')")+mi('trophy','جدول رتبه‌بندی',"view('lb')")+'</nav>'+
   '<div class="rc">'+pc('trophy','به‌زودی','مسابقات ویژه',"soon('مسابقات ویژه')",'promo')+pc('skull','حالت بازی',NM[S.mode],"view('modes')",'',1)+pc('pin','انتخاب نقشه',mp,"view('modes')",'',1)+pc('chest','رویداد ویژه','جعبه‌های جایزه',"view('box')",'ev')+'</div>'+
