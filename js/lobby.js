@@ -1,4 +1,4 @@
-// ===== lobby.js : screens (lobby, armory, boxes, missions...), startup =====
+// ===== lobby.js : screens (lobby, armory, wheel, missions...), startup =====
 // Every screen except the lobby itself uses shell(): top bar (back, title, E/ES) + content + bottom nav.
 const bt=(t,f,c)=>'<button class="m '+(c||'')+'" onclick="'+f+'">'+t+'</button>';
 const chips=(arr,cur,fn,dis)=>'<div class="chips">'+arr.map((n,i)=>'<button class="'+(cur==i?'on':'')+'" '+(dis&&dis(i)?'disabled':'')+' onclick="'+fn(i)+'">'+(n.n||n)+'</button>').join('')+'</div>';
@@ -22,7 +22,7 @@ function view(v){const m=$('mv'),S_=(t,b,tab,bare)=>{m.className='card lob3w';m.
   S_('رتبه‌بندی','<p>فعلاً رقبا شبیه‌سازی شده‌اند (BOT). بعد از وصل شدن سرور، بازیکن‌های واقعی جایگزین می‌شوند.</p>'+rows+bt('تغییر نام','rename()','g'),'lb')}
  else if(v=='set'){const rg=(l,k,a,b)=>'<h3>'+l+': <span id="sv_'+k+'">'+S.set[k]+'</span></h3><input type=range min='+a+' max='+b+' value='+S.set[k]+' oninput="S.set.'+k+'=+this.value;document.getElementById(\'sv_'+k+'\').textContent=this.value;save()">';
   S_('تنظیمات',bt('🎮 تنظیم محل و اندازه دکمه‌های نبرد','editHud()','g')+rg('حساسیت دوربین','sens',1,10)+rg('حساسیت نشانه‌گیری (ADS)','ad',1,10)+rg('میدان دید (FOV)','fov',60,100)+rg('صدا','vol',0,10)+'<h3>کیفیت گرافیک (صفحه دوباره بارگذاری می‌شود)</h3><div class="two">'+['پایین','متوسط','بالا'].map((n,i)=>bt(n,'S.set.q='+i+';save();location.reload()',S.set.q==i?'':'g')).join('')+'</div><h3>سختی بات‌ها</h3><div class="two">'+DN.map((n,i)=>bt(n,'S.set.diff='+i+';save();view(\'set\')',S.set.diff==i?'':'g')).join('')+'</div>','set')}
- else if(v=='box')S_('فروشگاه · جعبه‌های جایزه','<div id="bres" style="min-height:44px"></div>'+CR.map((c,i)=>'<button class="m g" onclick="openBox('+i+')">'+c.n+' · '+c.p+' '+ICO.E+'<br><small>اسطوره‌ای '+c.od[4]+'٪ · افسانه‌ای '+c.od[3]+'٪</small></button>').join('')+bt('خرید اسلحه (زرادخانه)',"view('arm')",'g'),'')
+ else if(v=='box'){S_('گردونه جایزه',wheelHTML(),'');wheelInit()}
  else if(v=='modes'){const md=S.mode,lv=md==2,cards=lv?LV.map((l,i)=>mapCard(l.map,(i+1)+' · '+MT[l.map].n+' · هدف '+l.goal,S.cl==i,i>S.camp,'S.cl='+i+';S.map='+l.map+";view('modes')")):MT.map((z,i)=>mapCard(i,z.n,S.map==i,false,'S.map='+i+";view('modes')"));
   S_('حالت بازی و نقشه','<h3>حالت بازی</h3>'+chips(NM,md,i=>'S.mode='+i+";view('modes')")+'<h3>'+(lv?'مرحله':'نقشه')+'</h3><div class="mapg">'+cards.join('')+'</div><h3>سختی بات‌ها</h3>'+chips(DN,S.set.diff,i=>'S.set.diff='+i+";save();view('modes')")+(md>2?'<p>۹۹ دشمن بات · زون کوچک‌شونده · '+(md==4?'اسکواد ۴ نفره (۳ هم‌تیمی بات)':'تک‌نفره')+'</p>':'')+bt('تأیید',"save();view('main')"),'')}
  else{m.className='card lob3w';m.innerHTML=lobbyHTML();netUp()}}
@@ -32,11 +32,6 @@ function setLo(k){S.lo[1]=S.lo[1]==k?null:k;save();view('arm')}
 function buyW(k){if(S.coins<WP[k].price)return;S.coins-=WP[k].price;S.owned[k]=0;save();view('arm')}
 function rename(){const n=prompt('نام جدید',S.name);if(n){S.name=n.replace(/[<>&"'`]/g,'').slice(0,14)||S.name;save();view(curView)}}
 function daily(){if(Date.now()-S.daily<=864e5)return toast('جایزه‌ی امروز را گرفته‌ای؛ بعداً دوباره بیا');S.daily=Date.now();S.coins+=200;save();view('main');toast('+۲۰۰ E دریافت شد')}
-const CR=[{n:'جعبه معمولی',p:400,od:[50,30,13,5,2]},{n:'جعبه کمیاب',p:900,od:[10,50,25,10,5]},{n:'جعبه اسطوره‌ای',p:2500,od:[0,0,50,35,15]},{n:'جعبه اسنایپر',p:1200,od:[30,35,20,10,5],pool:['sn','ds','rv','vu','am']},{n:'جعبه شاتگان و اسمجی',p:900,od:[30,35,20,10,5],pool:['sg','pm','as','db','smg','mp','vc','m7','um','p9','bz']}];
-function openBox(i){const c=CR[i];if(S.coins<c.p)return($('bres').innerHTML='<p>سکه کافی نیست.</p>');S.coins-=c.p;let r=Math.random()*100,ri=4,acc=0;for(let j=0;j<5;j++){acc+=c.od[j];if(r<acc){ri=j;break}}
- const ks=c.pool||Object.keys(WP),k=ks[Math.random()*ks.length|0];let n=0;
- const fin=()=>{let t;if(S.owned[k]===undefined){S.owned[k]=ri;t='اسلحه جدید '+WP[k].n+' · '+RAR[ri][0]+'!'}else if(S.owned[k]<ri){S.owned[k]=ri;t='ارتقا: '+WP[k].n+' ← '+RAR[ri][0]+'!'}else{S.coins+=100;t=WP[k].n+' '+RAR[ri][0]+' تکراری (+۱۰۰ سکه)'}save();$('bres').innerHTML='<p style="font-size:17px;color:'+hx(RAR[ri][1])+'">'+t+'</p>'};
- const iv=setInterval(()=>{const kk=ks[Math.random()*ks.length|0];$('bres').innerHTML='<p style="font-size:20px;color:'+hx(RAR[Math.random()*5|0][1])+'">'+WP[kk].n+'</p>';if(++n>16){clearInterval(iv);fin()}},80)}
 // v3 debug overlay: open the game with #debug at the end of the URL to see GPU object counts
 if(location.hash=='#debug'){const d=document.createElement('div');d.style.cssText='position:fixed;left:6px;bottom:6px;z-index:99;font:11px monospace;color:#0f0;background:#000a;padding:2px 6px;pointer-events:none';document.body.appendChild(d);setInterval(()=>{const mm=R.info.memory;d.textContent='geo '+mm.geometries+' tex '+mm.textures},1000)}
 // ---------- startup ----------
