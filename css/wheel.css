@@ -1,0 +1,19 @@
+/* ===== wheel.css : prize wheel (reel with gun pictures) ===== */
+.wh{display:flex;flex-direction:column;gap:10px}
+.whv{position:relative;height:152px;overflow:hidden;border-radius:12px;background:linear-gradient(#0e1b30,#0a1220);border:1px solid #ff7a0066}
+.whv::before,.whv::after{content:"";position:absolute;top:0;bottom:0;width:20%;z-index:2;pointer-events:none}
+.whv::before{left:0;background:linear-gradient(90deg,#0a1220,#0a122000)}
+.whv::after{right:0;background:linear-gradient(270deg,#0a1220,#0a122000)}
+.whp{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#ff7a00;z-index:3;box-shadow:0 0 12px #ff7a00}
+.whp::before{content:"";position:absolute;top:0;left:50%;margin-left:-8px;border:8px solid transparent;border-top:10px solid #ff7a00;border-bottom:0}
+.whs{position:absolute;left:0;top:10px;display:flex;gap:8px;will-change:transform}
+.wc{flex:0 0 116px;height:132px;box-sizing:border-box;border:2px solid var(--rc,#7f8c8d);border-radius:10px;background:linear-gradient(#16263f,#0c1626);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;box-shadow:inset 0 -34px 36px -30px var(--rc,#7f8c8d)}
+.wc img{width:104px;height:52px;object-fit:contain}
+.wc b{font-size:12px}
+.wc small{font-size:10px;color:var(--rc,#b4c6e0)}
+.whr{min-height:112px;display:flex;align-items:center;justify-content:center;gap:14px;border:1px solid #ffffff22;border-radius:12px;padding:8px;text-align:center;color:#b4c6e0;font-size:13px}
+.whr.on{border-color:var(--rc);background:radial-gradient(circle at 50% 40%,#ffffff14,#0000 70%);box-shadow:0 0 18px -4px var(--rc)}
+.whr img{width:200px;height:100px;object-fit:contain}
+.whr b{font-size:17px}
+.who{margin:2px 0 4px;font-size:12px}
+@media (prefers-reduced-motion:reduce){.whs{transition:none!important}}
