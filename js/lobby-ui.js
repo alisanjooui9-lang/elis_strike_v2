@@ -2,7 +2,7 @@
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Names are rendered with innerHTML in several places, so markup characters are removed at the source.
 S.name=String(S.name||'').replace(/[<>&"'`]/g,'').slice(0,14)||'Player';
-// ES = premium currency. Starts at 50 and is earned by completing missions (see missions.js). Nothing spends it yet.
+// ES = premium currency. Starts at 50, is earned by completing missions (see missions.js) and is spent on prize wheel spins (see wheel.js).
 if(!Number.isFinite(S.es))S.es=50;
 const IC={
  cart:'<path d="M3 4h3l2.5 11h9.5l2-8H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/>',
@@ -55,7 +55,7 @@ function lobbyHTML(){
  return '<div class="lob3"><div class="tb">'+
   '<div class="logo" role="img" aria-label="ELIS STRIKE V2"><span>ELIS</span><span>STRIKE</span><small>V2</small></div>'+
   '<button class="prof" onclick="rename()" aria-label="تغییر نام">'+AVA+'<div class="rt"><b>'+esc(S.name)+'</b><small>Lv. '+S.lv+'</small><div class="xpb"><i style="width:'+pct+'%"></i></div></div></button><div class="sp"></div>'+
-  '<div class="cu">'+ICO.E+'<b>'+S.coins+'</b><button aria-label="افزودن E" onclick="view(\'box\')">+</button></div>'+
+  '<div class="cu">'+ICO.E+'<b>'+S.coins+'</b><button aria-label="جایزه روزانه (E)" onclick="daily()">+</button></div>'+
   '<div class="cu es">'+ICO.ES+'<b>'+S.es+'</b><button aria-label="کسب ES از مأموریت‌ها" onclick="view(\'ms\')">+</button></div>'+
   '<button class="ib" aria-label="دوستان" onclick="soon(\'دوستان\')">'+ic('people')+'</button><button class="ib" aria-label="پیام‌ها" onclick="soon(\'پیام‌ها\')">'+ic('mail')+'</button><button class="ib" id="fsb" aria-label="تمام‌صفحه" onclick="toggleFS()">'+ic(isFS()?'fullx':'full')+'</button><button class="ib" aria-label="تنظیمات" onclick="view(\'set\')">'+ic('gear')+'</button>'+
   '<span id="net" class="net ok" role="img" aria-label="وضعیت اتصال">'+ic('wifi')+'</span></div>'+
