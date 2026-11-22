@@ -1,0 +1,27 @@
+/* ===== hud.css : in-battle HUD + match result in the same navy / neon blue / gold look as the lobby =====
+   Visual only: no behaviour changes. Loaded after the inline styles in index.html, so it overrides their colours.
+   Positions and sizes of the touch buttons stay as they are (they are set inline and by the HUD layout editor). */
+#hp{box-sizing:border-box;padding:6px 12px 8px;background:linear-gradient(90deg,#0a1424e6,#10213ccc);border:1px solid #2a6fc0;border-left:3px solid #f5c542;clip-path:polygon(0 0,100% 0,94% 100%,0 100%);font-weight:700;color:#eaf2ff;text-shadow:0 1px 2px #000}
+#hpb{height:10px;transform:none;background:#000a;border:1px solid #2a6fc0;border-radius:2px;overflow:hidden}
+#sc{padding:5px 18px;background:linear-gradient(#0a1424ee,#060c18ee);border:1px solid #2a6fc0;border-top:0;border-radius:0 0 8px 8px;color:#f5c542;font-weight:700;text-shadow:0 1px 2px #000;box-shadow:0 0 14px #1f6fd855}
+#feed{padding:4px 8px;border-right:3px solid #f5c542;background:linear-gradient(270deg,#0a1424aa,#0000);border-radius:0 0 0 4px}
+#feed:empty,#tmh:empty{visibility:hidden}
+#ammo{padding:4px 16px 6px;background:linear-gradient(90deg,#0a1424d9,#10213ccc);border:1px solid #2a6fc0;border-bottom:3px solid #f5c542;clip-path:polygon(6% 0,100% 0,100% 100%,0 100%);color:#f5c542;line-height:1.15}
+#ammo small{font-size:11px;font-weight:400;color:#9fb6d6}
+#mm{border:1px solid #38a4ff;border-radius:6px;background:#050b16d9;box-shadow:0 0 12px #38a4ff55}
+#tmh{padding:3px 8px;background:#0a1424aa;border-left:3px solid #38a4ff;border-radius:0 4px 4px 0}
+#msg{color:#f5c542;font-weight:700;letter-spacing:.5px}
+#base{border-color:#38a4ff88;background:#38a4ff14}
+#knob{background:radial-gradient(#7fd4ff,#1f6fd8)}
+.b{background:radial-gradient(#1a3a6b,#0b1424 75%);border:2px solid #38a4ff;box-shadow:0 0 10px #38a4ff66,inset 0 0 10px #1f6fd855;font-weight:700;text-shadow:0 1px 2px #000}
+.b:active{filter:brightness(1.4)}
+#bF{background:radial-gradient(#6b4d0c,#2a1d05 75%);border-color:#f5c542;color:#f5c542;box-shadow:0 0 14px #f5c54288,inset 0 0 12px #f5c54233}
+#bW{border-color:#f5c542;color:#f5c542}
+#bX{background:#1a0a0ecc;border-color:#ff5a5a}
+#ed{background:#0a1424ee;border:1px solid #2a6fc0;color:#eaf2ff}
+#ed button{background:linear-gradient(#ffe27a,#f0b400);color:#2a1b00;font-weight:700}
+#rot{background:#050a14;color:#f5c542}
+/* match result card (built by endMatch in game.js) */
+.card.nar{border-color:#f5c542;box-shadow:0 0 30px #f5c54233}
+.card.nar h1{font-size:30px;font-style:italic;background:linear-gradient(#fff,#f5c542 60%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card.nar .row:first-of-type span,.card.nar .row:first-of-type b{color:#f5c542}
