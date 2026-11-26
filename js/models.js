@@ -58,14 +58,26 @@ function airTick(dt){if(P.fly==1){const d=PL.t*PL.s;P.x=PL.m.position.x;P.z=PL.m
  const ch=P.chute,sp=ch?11:20;P.vx+=((fx*iy+Math.cos(yaw)*ix)*sp-P.vx)*Math.min(1,dt*1.5);P.vz+=((fz*iy-Math.sin(yaw)*ix)*sp-P.vz)*Math.min(1,dt*1.5);P.x=clamp(P.x+P.vx*dt,-95,95);P.z=clamp(P.z+P.vz*dt,-95,95);
  P.fs+=((ch?12:50)-P.fs)*Math.min(1,dt*(ch?3.3:2.5));P.y-=P.fs*dt;CNP.visible=!!ch;if(ch){CNP.position.set(P.x,P.y+4.4,P.z);CNP.scale.setScalar(Math.min(1,(tm-P.ct)*2.5)+.01)}
  if(P.y<=0){P.y=0;P.vy=0;P.fly=0;P.vx=P.vz=0;CNP.visible=false;fixPos(P);snd(150,.2,'sine',.06);say('فرود! اسلحه پیدا کن',1800)}else say('ارتفاع '+Math.ceil(P.y)+' متر',250)}
-function addLoot(k,x,z){const g=LM[k]||(LM[k]=gunModel(k,S.owned[k]||0)),m=g.clone();m.scale.setScalar(1.7);m.position.set(x,.9,z);sc.add(m);loot.push({k,x,z,m})}
-function spawnLoot(){for(const l of loot)sc.remove(l.m);loot.length=0;const pool=[];Object.keys(WP).forEach(k=>{const w=WP[k].t=='sn'?1:WP[k].t=='lmg'||WP[k].t=='pi'?2:4;for(let i=0;i<w;i++)pool.push(k)});for(let i=0,n=0;i<900&&n<110;i++){const x=(Math.random()-.5)*190,z=(Math.random()-.5)*190;if(!col(x,z,1.2)){addLoot(pool[Math.random()*pool.length|0],x,z);n++}}}
+// ---- v3: ammo / armor pickups (battle royale only) ----
+const ITM={ammo:{n:'مهمات +۶۰'},armor:{n:'آرمور +۵۰'}},MAXRES=300;
+function itemModel(k){const g=new THREE.Group(),M=c=>new THREE.MeshPhongMaterial({color:c,shininess:30}),b=(w,h,d,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);g.add(o)};
+ if(k=='ammo'){b(.5,.3,.34,M(0x4b5a32),0,0,0);b(.52,.06,.36,M(0xf1c40f),0,.05,0)}else{b(.46,.5,.2,M(0x2e6fd1),0,0,0);b(.3,.3,.04,M(0x1b2028),0,0,.11)}
+ g.traverse(o=>o.frustumCulled=false);return g}
+function addLoot(k,x,z){const g=LM[k]||(LM[k]=ITM[k]?itemModel(k):gunModel(k,S.owned[k]||0)),m=g.clone();m.scale.setScalar(ITM[k]?1.5:1.7);m.position.set(x,.9,z);sc.add(m);loot.push({k,x,z,m})}
+// loot: guns, ammo and armor inside houses/high ground (lootSpots from build) plus scattered outdoors
+function spawnLoot(){for(const l of loot)sc.remove(l.m);loot.length=0;const pool=[];Object.keys(WP).forEach(k=>{const w=WP[k].t=='sn'?1:WP[k].t=='lmg'||WP[k].t=='pi'?2:4;for(let i=0;i<w;i++)pool.push(k)});
+ const kind=(g,a)=>{const q=Math.random();return q<g?pool[Math.random()*pool.length|0]:q<g+a?'ammo':'armor'};
+ for(const s of lootSpots)addLoot(kind(.6,.25),s.x,s.z);
+ for(let i=0,n=0;i<900&&n<80;i++){const x=(Math.random()-.5)*190,z=(Math.random()-.5)*190;if(!col(x,z,1.2)){addLoot(kind(.68,.22),x,z);n++}}}
 function equip(k){P.am[S.sel]=P.ammo;S.sel=k;P.ammo=P.am[k]!==undefined?P.am[k]:mg(k);P.rl=0;ads=0;buildVM()}
 function swapW(){if(state!='play'||P.fly||!P.slots)return;const o=P.slots.find(x=>x&&x!=S.sel);if(o)equip(o)}
-function pickup(){const l=nearL;if(!l||P.fly)return;const k=l.k,sl=P.slots;loot.splice(loot.indexOf(l),1);sc.remove(l.m);nearL=null;if(sl.includes(k)){P.am[k]=mg(k);if(S.sel==k)P.ammo=mg(k)}else{let i=sl.indexOf(S.sel);if(sl[1]==null)i=1;else addLoot(S.sel,P.x+1.2,P.z+1.2);sl[i]=k;equip(k)}snd(700,.1,'sine',.06);say(WP[k].n,800)}
+function pickup(){const l=nearL;if(!l||P.fly)return;const k=l.k,sl=P.slots;
+ if(ITM[k]){if(k=='ammo'){if(P.res>=MAXRES){say('مهمات پر است',800);return}P.res=Math.min(MAXRES,P.res+60)}else{if(P.ar>=100){say('آرمور کامل است',800);return}P.ar=Math.min(100,P.ar+50)}loot.splice(loot.indexOf(l),1);sc.remove(l.m);nearL=null;snd(700,.1,'sine',.06);say(ITM[k].n,800);return}
+ loot.splice(loot.indexOf(l),1);sc.remove(l.m);nearL=null;if(sl.includes(k)){P.am[k]=mg(k);if(S.sel==k)P.ammo=mg(k)}else{let i=sl.indexOf(S.sel);if(sl[1]==null)i=1;else addLoot(S.sel,P.x+1.2,P.z+1.2);sl[i]=k;equip(k)}snd(700,.1,'sine',.06);say(WP[k].n,800)}
 function mkLabel(t){const k=document.createElement('canvas');k.width=256;k.height=64;const g=k.getContext('2d');g.font='bold 34px Tahoma';g.textAlign='center';g.fillStyle='#2ecc71';g.strokeStyle='#000';g.lineWidth=5;g.strokeText(t,128,42);g.fillText(t,128,42);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(k),depthTest:false,transparent:true}));s.scale.set(2.4,.6,1);s.renderOrder=9;return s}
 const mx=$('mm').getContext('2d');
-function drawMap(){const hf=S.mode>2?100:44,k=260/(2*hf),X=x=>(x+hf)*k,Y=z=>(z+hf)*k;mx.clearRect(0,0,260,260);mx.fillStyle='#1b2433';mx.fillRect(0,0,260,260);mx.fillStyle='#6b7688';for(const b of boxes)mx.fillRect(X(b.x0),Y(b.z0),Math.max(1.5,(b.x1-b.x0)*k),Math.max(1.5,(b.z1-b.z0)*k));
+// minimap: boxes with y0>2 (roofs, lintels, window tops) are skipped so houses show as walls with open doors
+function drawMap(){const hf=S.mode>2?100:44,k=260/(2*hf),X=x=>(x+hf)*k,Y=z=>(z+hf)*k;mx.clearRect(0,0,260,260);mx.fillStyle='#1b2433';mx.fillRect(0,0,260,260);mx.fillStyle='#6b7688';for(const b of boxes){if((b.y0||0)>2)continue;mx.fillRect(X(b.x0),Y(b.z0),Math.max(1.5,(b.x1-b.x0)*k),Math.max(1.5,(b.z1-b.z0)*k))}
  if(S.mode>2){mx.strokeStyle='#f33';mx.lineWidth=3;mx.beginPath();mx.arc(X(ZN.x),Y(ZN.z),ZN.r*k,0,6.3);mx.stroke();if(ZN.sh){mx.strokeStyle='#fff';mx.lineWidth=1;mx.beginPath();mx.arc(X(ZN.tx),Y(ZN.tz),ZN.tr*k,0,6.3);mx.stroke()}mx.fillStyle='#fc3';for(const l of loot)mx.fillRect(X(l.x)-1.5,Y(l.z)-1.5,3,3);if(PL&&PL.m.visible){mx.fillStyle='#fff';mx.fillRect(X(PL.m.position.x)-4,Y(PL.m.position.z)-4,8,8)}}
  mx.fillStyle='#2ecc71';for(const b of bots)if(b.team==P.team&&!b.dead&&b.fall!=1){mx.beginPath();mx.arc(X(b.x),Y(b.z),4,0,6.3);mx.fill()}
  mx.save();mx.translate(X(P.x),Y(P.z));mx.rotate(-yaw);mx.fillStyle='#ffd400';mx.beginPath();mx.moveTo(0,-8);mx.lineTo(5,6);mx.lineTo(-5,6);mx.fill();mx.restore()}
