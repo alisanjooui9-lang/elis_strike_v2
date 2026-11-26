@@ -1,6 +1,6 @@
 // ===== game.js : player, bots, combat, match flow, input, update loop =====
 // ---------- entities ----------
-const P={x:0,z:0,y:0,vy:0,vx:0,vz:0,sl:0,ch:1.7,hp:100,dead:false,rs:0,team:0,kills:0,name:'You',ammo:0,cd:0,rl:0,lastHit:0,flash:0},bots=[];
+const P={x:0,z:0,y:0,vy:0,vx:0,vz:0,sl:0,ch:1.7,hp:100,dead:false,rs:0,team:0,kills:0,name:'You',ammo:0,res:Infinity,ar:0,cd:0,rl:0,lastHit:0,flash:0},bots=[];
 let yaw=0,pitch=0,state='lobby',T=0,score={},ads=0,fire=0,fireEdge=0,jx=0,jy=0,jumpReq=0,slideReq=0,vmK=0,tm=0,heat=0,goal=0,vm,fl;
 const aimK=()=>ads?S.set.ad/10*clamp(cam.fov/60,.3,1.2):1;
 const NAMES=['xShadow','Kira_77','NoScope','Vortex','Reza.GG','Blaze','Sniper_Ali','Ghost','Mahan','Hunter','Zed','Nima_pro','Storm','Viper','Aras','Dara'];
@@ -11,7 +11,7 @@ function startMatch(){fs();const md=S.mode,L=LV[S.cl];P.keep=S.sel;P.am={};P.slo
  const list=md>2?Array.from({length:99},(_,i)=>({team:md==3?i+1:(i<3?0:1+((i-3)/4|0)),sk:rr(.3,.85)*df})):md==2?Array.from({length:L.n},()=>({team:1,sk:L.sk*df})):Array.from({length:7},(_,i)=>({team:md?(i<3?0:1):i+1,sk:rr(.35,.9)*df}));
  list.forEach((d,i)=>{const b={id:i,team:d.team,name:NAMES[(i*2+(Math.random()*2|0))%NAMES.length]+(Math.random()<.4?(Math.random()*99|0):''),x:0,z:0,hp:100,dead:false,rs:0,kills:0,yaw:0,sk:clamp(d.sk,.2,1.5),react:rr(.25,.6)/clamp(d.sk+.3,.5,2),seen:0,cd:0,wa:0,wt:0,t:0,m:md>2?mkBotL(d.team):mkBot(d.team)};spawnAt(b);bots.push(b)});
  if(md>2){const LD_={};bots.forEach(b=>{b.fall=1;b.m.visible=false;b.ft=rr(2,24);b.mate=md==4&&b.team==0;b.ox=rr(-6,6);b.oz=rr(-6,6);if(md==4&&b.team>0){const l=LD_[b.team];if(!l)LD_[b.team]=b;else{b.x=l.x+rr(-5,5);b.z=l.z+rr(-5,5);fixPos(b)}}if(b.mate){b.lb=mkLabel(b.name);sc.add(b.lb)}})}else if(md==1)bots.forEach(b=>{if(b.team==0){b.lb=mkLabel(b.name);sc.add(b.lb)}});
- spawnAt(P);ads=0;yaw=0;pitch=0;P.ammo=mg(S.sel);P.rl=0;T=md>2?1200:md==2?180:150;goal=md==2?L.goal:0;score={0:0};for(const b of bots)score[b.team]=score[b.team]||0;
+ spawnAt(P);ads=0;yaw=0;pitch=0;P.ammo=mg(S.sel);P.rl=0;P.res=md>2?120:Infinity;P.ar=0;T=md>2?1200:md==2?180:150;goal=md==2?L.goal:0;score={0:0};for(const b of bots)score[b.team]=score[b.team]||0;
  buildVM();if(md>2){zoneInit();planeInit();P.fly=1;yaw=Math.atan2(-PL.dx,-PL.dz);pitch=-.45;spawnLoot()}else{P.fly=0;if(ZM)ZM.visible=false;if(PL)PL.m.visible=false;for(const l of loot)sc.remove(l.m);loot.length=0}$('tmh').innerHTML='';state='play';$('menu').style.display='none';for(const e of document.querySelectorAll('.hud,.b'))e.style.display='block';$('base').style.display='none';$('feed').innerHTML='';say(md>2?'پرش = پریدن از هواپیما 🪂':md==2?'مرحله '+(S.cl+1)+': '+goal+' حذف لازم است':'نبرد شروع شد!',md>2?5000:2000)}
 function say(t,ms){const m=$('msg');m.textContent=t;m.style.opacity=t?1:0;clearTimeout(say.t);if(ms)say.t=setTimeout(()=>m.style.opacity=0,ms)}
 function feed(t){const f=$('feed');f.innerHTML=t+'<br>'+f.innerHTML.split('<br>').slice(0,4).join('<br>')}
@@ -21,7 +21,8 @@ function tracer(a,b){const l=new THREE.Line(new THREE.BufferGeometry().setFromPo
 
 // ---------- combat ----------
 function kill(v,att_){v.dead=true;v.rs=3;if(v.m)v.m.visible=false;score[att_.team]=(score[att_.team]||0)+1;att_.kills++;feed('<b>'+att_.name+'</b> ⟵ '+v.name);if(att_===P){snd(500,.15,'sine',.08);const ri=S.owned[S.sel]||0;say(ri>2?(ri>3?'☠ MYTHIC ':'⭐ LEGENDARY ')+v.name:'حذف '+v.name,900);killFx(v.x,v.z,ri)}if(v===P)say('کشته شدی! بازگشت تا ۳ ثانیه',2800)}
-function hurtP(d,a){if(P.dead||P.fly||state!='play')return;P.hp-=d;P.lastHit=tm;$('vg').style.opacity=1;if(P.hp<=0){P.hp=0;kill(P,a)}}
+// armor absorbs 60% of damage from players/bots (not from the zone, team -1) until it runs out
+function hurtP(d,a){if(P.dead||P.fly||state!='play')return;if(P.ar>0&&a.team!==-1){const x=Math.min(P.ar,d*.6);P.ar-=x;d-=x}P.hp-=d;P.lastHit=tm;$('vg').style.opacity=1;if(P.hp<=0){P.hp=0;kill(P,a)}}
 function hurtB(b,d,a,head){b.hp-=d;if(a===P){$('hm').style.opacity=1;$('hm').style.borderColor=head?'#ffd400':'#ff3b3b';setTimeout(()=>$('hm').style.opacity=0,120);snd(head?1300:900,.05,'sine',.05)}if(b.hp<=0&&!b.dead)kill(b,a)}
 function shoot(){const w=WP[S.sel],a=att(S.sel),rc=(a.mz==2?.7:1)*(a.gr==1?.75:1);P.ammo--;P.cd=w.rof;heat=Math.min(1,heat+.15);snd(rr(90,140),.09,'sawtooth',a.mz==1?.03:.09);vmK=.06+(w.t=='sn'?.1:0);P.flash=a.mz==1?.02:.05;pitch+=(w.pel>1?.03:w.t=='sn'?.05:.008)*rc;yaw+=rr(-.004,.004)*rc;
  const base=new THREE.Vector3();cam.getWorldDirection(base);const o=cam.position,mv=Math.hypot(P.vx,P.vz)>2?1.5:1;
@@ -30,7 +31,8 @@ function shoot(){const w=WP[S.sel],a=att(S.sel),rc=(a.mz==2?.7:1)*(a.gr==1?.75:1
   if(hit)hurtB(hit,w.dmg*(hd?2:1),P,hd);else if(bt_<150)spark(o.clone().add(d.clone().multiplyScalar(bt_-.05)));
   if(p==0&&w.pel==1)tracer(o.clone().add(new THREE.Vector3(Math.cos(yaw)*.2-Math.sin(yaw)*.9,-.15,-Math.sin(yaw)*.2-Math.cos(yaw)*.9)),o.clone().add(d.clone().multiplyScalar(Math.min(bt_,70))))}
  if(P.ammo<=0)reload()}
-function reload(){const w=WP[S.sel];if(P.rl>0||P.ammo==mg(S.sel))return;P.rl=w.rl*(att(S.sel).mg?1.15:1);say('ریلود...',0)}
+// reload takes bullets from the reserve (P.res); outside battle royale the reserve is Infinity
+function reload(){const w=WP[S.sel];if(P.rl>0||P.ammo==mg(S.sel))return;if(P.res<=0){say('مهمات تمام شد!',1200);return}P.rl=w.rl*(att(S.sel).mg?1.15:1);say('ریلود...',0)}
 function bmove(b,dx,dz,s){const l=Math.hypot(dx,dz)||1;dx=dx/l*s;dz=dz/l*s;let m=false;if(!col(b.x+dx,b.z,.5)){b.x+=dx;m=true}if(!col(b.x,b.z+dz,.5)){b.z+=dz;m=true}return m}
 function botAI(b,dt){if(b.dead){if(S.mode>2)return;b.rs-=dt;if(b.rs<=0){b.dead=false;b.hp=100;spawnAt(b);b.m.visible=true}return}
  if(b.fall){if(b.fall==1){if(b.mate){if(P.fly!=1){b.x=P.x+b.ox;b.z=P.z+b.oz;b.fy=P.y;b.fall=2}else return}else{b.ft-=dt;if(b.ft<=0){b.fall=2;b.fy=110}else return}}
@@ -85,7 +87,7 @@ function update(dt){tm+=dt;T-=dt;if(S.mode>2)brTick(dt);if(T<=0||(goal&&P.kills>
   if(jumpReq&&gr){P.vy=8.5;P.sl=0;P.jc=1;snd(260,.12,'sine',.04)}else if(jumpReq&&!gr&&P.jc==1){P.vy=7.5;P.jc=2}jumpReq=0;
   const nx=P.x+P.vx*dt;if(!col(nx,P.z,.45,P.y))P.x=nx;else P.vx=0;const nz=P.z+P.vz*dt;if(!col(P.x,nz,.45,P.y))P.z=nz;else P.vz=0;
   P.vy-=16*dt;P.y=Math.max(fl0,P.y+P.vy*dt);if(P.y<=fl0&&P.vy<0){P.vy=0;P.jc=0}
-  P.cd-=dt;heat=Math.max(0,heat-dt*.8);if(P.rl>0){P.rl-=dt;if(P.rl<=0){P.ammo=mg(S.sel);say('')}}
+  P.cd-=dt;heat=Math.max(0,heat-dt*.8);if(P.rl>0){P.rl-=dt;if(P.rl<=0){const t=Math.min(mg(S.sel)-P.ammo,P.res);P.ammo+=t;P.res-=t;say('')}}
   if(fire&&P.ammo>0&&P.rl<=0&&P.cd<=0&&(w.auto||fireEdge)&&!sprint)shoot();fireEdge=0;
   if(tm-P.lastHit>5&&P.hp<100)P.hp=Math.min(100,P.hp+25*dt);
   const spd=Math.hypot(P.vx,P.vz),bob=gr&&P.sl<=0&&spd>.5?Math.sin(tm*(sprint?13:9))*.012*(spd/6):0;
@@ -93,7 +95,7 @@ function update(dt){tm+=dt;T-=dt;if(S.mode>2)brTick(dt);if(T<=0||(goal&&P.kills>
   P.flash-=dt;fl.visible=P.flash>0;fl.rotation.z=Math.random()*6}
  if(S.mode>2)planeTick(dt);for(const b of bots)botAI(b,dt);
  for(const b of bots)if(b.lb){b.lb.visible=!b.dead&&b.fall!=1;b.lb.position.set(b.x,(b.fall==2?b.fy:0)+2.3,b.z)}
- if(S.mode>2){nearL=null;let nd=3.2;for(const l of loot){const d=Math.hypot(l.x-P.x,l.z-P.z),v=d<55;l.m.visible=v;if(v){l.m.rotation.y+=dt*1.2;l.m.position.y=.9+Math.sin(tm*2+l.x)*.08;if(!P.fly&&!P.dead&&d<nd){nd=d;nearL=l}}}const bw=$('bW');bw.style.display=nearL?'block':'none';if(nearL){const tt='برداشتن '+WP[nearL.k].n;if(bw.textContent!=tt)bw.textContent=tt}}else $('bW').style.display='none';
+ if(S.mode>2){nearL=null;let nd=3.2;for(const l of loot){const d=Math.hypot(l.x-P.x,l.z-P.z),v=d<55;l.m.visible=v;if(v){l.m.rotation.y+=dt*1.2;l.m.position.y=.9+Math.sin(tm*2+l.x)*.08;if(!P.fly&&!P.dead&&d<nd){nd=d;nearL=l}}}const bw=$('bW');bw.style.display=nearL?'block':'none';if(nearL){const tt='برداشتن '+(WP[nearL.k]||ITM[nearL.k]).n;if(bw.textContent!=tt)bw.textContent=tt}}else $('bW').style.display='none';
  const tch=P.sl>0?1.0:1.7;P.ch+=(tch-P.ch)*Math.min(1,dt*12);
  const shk=P.fly==2&&!P.chute?.05:0;cam.position.set(P.x+rr(-shk,shk),P.ch+P.y-(P.dead?1.2:0)+rr(-shk,shk),P.z);cam.rotation.set(pitch,yaw,P.dead?.5:P.sl>0?-.06:P.fly==2?Math.sin(tm*(P.chute?2:7))*(P.chute?.06:.03):0,'YXZ');
  const lz=att(S.sel).gr==2&&!P.dead;LS.visible=LD.visible=lz;if(lz){const d=new THREE.Vector3();cam.getWorldDirection(d);const o=cam.position;let t=Math.min(wallT(o,d),90);for(const b of bots)if(!b.dead&&b.team!=P.team){const q=rsph(o,d,[b.x,1.3,b.z],.5);if(q<t)t=q}
@@ -105,7 +107,7 @@ function update(dt){tm+=dt;T-=dt;if(S.mode>2)brTick(dt);if(T<=0||(goal&&P.kills>
  for(let i=FXP.length-1;i>=0;i--){const f=FXP[i],m=f.m;f.t-=dt*(f.pil?1.5:1);if(f.v){m.position.x+=f.v[0]*dt;m.position.y+=f.v[1]*dt;m.position.z+=f.v[2]*dt;f.v[1]-=9*dt;m.lookAt(cam.position)}if(f.ring)m.scale.setScalar(1+(1-f.t)*14);m.material.opacity=Math.max(0,f.t);if(f.t<=0){sc.remove(m);m.geometry.dispose();m.material.dispose();FXP.splice(i,1)}}
  for(const s of sp)if(s.t>0){s.t-=dt;if(s.t<=0)s.m.visible=false}
  $('vg').style.opacity=Math.max(0,($('vg').style.opacity||0)-dt*1.5);
- if(tm-mmT>.12){mmT=tm;drawMap();if(S.mode==4||S.mode==1)teamHud()}$('hpf').style.width=P.hp+'%';$('hpf').style.background=P.hp>40?'#2ecc71':'#e74c3c';$('hpt').textContent='سلامت '+Math.ceil(P.hp);$('ammo').innerHTML='<small>'+WP[S.sel].n+(P.slots&&P.slots[1]?' ⇄':'')+'</small><br>'+(P.rl>0?'...':P.ammo+' / '+mg(S.sel));
+ if(tm-mmT>.12){mmT=tm;drawMap();if(S.mode==4||S.mode==1)teamHud()}$('hpf').style.width=P.hp+'%';$('hpf').style.background=P.hp>40?'#2ecc71':'#e74c3c';$('hpt').textContent='سلامت '+Math.ceil(P.hp)+(P.ar>0?' · آرمور '+Math.ceil(P.ar):'');$('ammo').innerHTML='<small>'+WP[S.sel].n+(P.slots&&P.slots[1]?' ⇄':'')+'</small><br>'+(P.rl>0?'...':P.ammo+' / '+(P.res===Infinity?mg(S.sel):P.res));
  const m=Math.floor(T/60),s=Math.floor(T%60),md=S.mode;$('sc').textContent=(md>2?'زنده '+aliveN()+' · کیل '+P.kills+' · منطقه '+Math.ceil(ZN.r)+'m '+(ZN.sh?'⚠ کوچک می‌شود':Math.ceil(ZN.t)+'s'):md==1?'تیم شما '+(score[0]||0)+' — دشمن '+(score[1]||0):md==2?'هدف: '+P.kills+' / '+goal:'کیل: '+P.kills+' | برترین '+Math.max(P.kills,...bots.map(b=>b.kills)))+' · '+m+':'+String(s).padStart(2,'0')}
 let last=performance.now();
 function loop(n){requestAnimationFrame(loop);const dt=Math.min((n-last)/1000,.05);last=n;
